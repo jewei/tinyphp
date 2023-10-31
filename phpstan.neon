@@ -1,0 +1,8 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - helpers.php
+    bootstrapFiles:
+        - helpers.php
+    treatPhpDocTypesAsCertain: false

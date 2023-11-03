@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace TinyPHP;
 
-final class Application extends Container
+class Application extends Container
 {
 }

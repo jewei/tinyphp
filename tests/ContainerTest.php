@@ -59,28 +59,28 @@ it('throws an exception for unknown services', function () {
     $app->get('UnknownService');
 })->throws(TinyPHP\EntryNotFoundException::class);
 
-final class TestConfig
+class TestConfig
 {
     public function __construct(public string $foo = 'bar')
     {
     }
 }
 
-final class TestDatabase
+class TestDatabase
 {
     public function __construct(public TestConfig $config)
     {
     }
 }
 
-final class TestApp
+class TestApp
 {
     public function __construct(public TestDatabase $database)
     {
     }
 }
 
-final class TestVariadicPrimitive
+class TestVariadicPrimitive
 {
     public function __construct(public array $params = [])
     {

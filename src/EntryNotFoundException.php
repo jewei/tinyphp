@@ -7,6 +7,6 @@ namespace TinyPHP;
 use Exception;
 use Psr\Container\NotFoundExceptionInterface;
 
-final class EntryNotFoundException extends Exception implements NotFoundExceptionInterface
+class EntryNotFoundException extends Exception implements NotFoundExceptionInterface
 {
 }

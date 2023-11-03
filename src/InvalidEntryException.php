@@ -7,6 +7,6 @@ namespace TinyPHP;
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
 
-final class InvalidEntryException extends Exception implements ContainerExceptionInterface
+class InvalidEntryException extends Exception implements ContainerExceptionInterface
 {
 }

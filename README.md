@@ -1,14 +1,5 @@
 # TinyPHP
 
-TinyPHP is an inversion of control (IoC) container for extensible, highly-decoupled modules.
-
-# Adopted concept
-
-1. Choose boring technology - PHP, SQLite.
-
-
-# TinyPHP
-
 TinyPHP is a minimalistic PHP framework designed for learning PHP in-depth. It focuses on simplicity, clarity, and adheres to best practices and PSR standards.
 
 ## Features

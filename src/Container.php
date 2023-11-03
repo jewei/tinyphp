@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace TinyPHP;
 
+use Closure;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionNamedType;
 use ReflectionParameter;
 
 abstract class Container implements ContainerInterface
@@ -65,7 +67,7 @@ abstract class Container implements ContainerInterface
         $definition = $this->definitions[$id];
 
         // If the entry type is a Closure, execute it and return the result.
-        if ($definition instanceof \Closure) {
+        if ($definition instanceof Closure) {
             return $definition($this);
         }
 
@@ -105,23 +107,27 @@ abstract class Container implements ContainerInterface
         $results = [];
 
         foreach ($dependencies as $dependency) {
-
             $className = $this->getParameterClassName($dependency);
 
+            // If $className is null, it means the dependency is a primitive type or variadic.
             $result = is_null($className)
                 ? $this->resolvePrimitive($dependency)
                 : $this->get($className);
 
+            // Check if the dependency is variadic. Variadic parameters are captured as an array.
             if ($dependency->isVariadic()) {
                 $results = array_merge($results, $result); /** @phpstan-ignore-line */
             } else {
-                $results[] = $result;
+                $results[] = $result; // If it's not variadic, add the resolved dependency to the array.
             }
         }
 
-        return $results;
+        return $results; // Return the array of resolved dependencies.
     }
 
+    /**
+     * Resolve a non-class dependency, either a string or other primitive type.
+     */
     private function resolvePrimitive(ReflectionParameter $parameter): mixed
     {
         if ($parameter->isDefaultValueAvailable()) {
@@ -136,18 +142,20 @@ abstract class Container implements ContainerInterface
     }
 
     /**
-     * Get the class name of the given ReflectionParameter
+     * Get the class name of the given ReflectionParameter.
      */
     private function getParameterClassName(ReflectionParameter $parameter): ?string
     {
         $type = $parameter->getType();
 
-        if (! $type instanceof \ReflectionNamedType || $type->isBuiltin()) {
+        // Checks for built-in types.
+        if (! $type instanceof ReflectionNamedType || $type->isBuiltin()) {
             return null;
         }
 
         $name = $type->getName();
 
+        // Handles self and parent references.
         if (! is_null($class = $parameter->getDeclaringClass())) {
             if ($name === 'self') {
                 return $class->getName();

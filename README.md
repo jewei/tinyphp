@@ -13,7 +13,7 @@ TinyPHP is a minimalistic PHP framework designed for learning PHP in-depth. It f
 ## Installation
 
 ```bash
-composer create-project jewei/tinyphp myapp
+composer create-project jewei/tinyphp:dev-main myapp
 
 ```
 

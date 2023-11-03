@@ -9,16 +9,17 @@ use Psr\Container\NotFoundExceptionInterface;
 
 final class Container implements ContainerInterface
 {
-    protected $definitions = [];
-    protected $instances = [];
+    private array $definitions = [];
+
+    private array $instances = [];
 
     public function get(string $id)
     {
-        if (!$this->has($id)) {
+        if (! $this->has($id)) {
             throw new class () extends \Exception implements NotFoundExceptionInterface {};
         }
 
-        if (!isset($this->instances[$id])) {
+        if (! isset($this->instances[$id])) {
             $this->instances[$id] = $this->resolve($id);
         }
 
@@ -30,12 +31,18 @@ final class Container implements ContainerInterface
         return isset($this->definitions[$id]);
     }
 
-    public function set($id, $value)
+    /**
+     *
+     * @param mixed $id The FQCN of the abstract class.
+     * @param mixed $value The interface object.
+     * @return void
+     */
+    public function set($id, $value): void
     {
         $this->definitions[$id] = $value;
     }
 
-    protected function resolve($id)
+    private function resolve(string $id)
     {
         $definition = $this->definitions[$id];
 
@@ -46,7 +53,7 @@ final class Container implements ContainerInterface
         // Simplified auto-wiring.
         $reflectionClass = new \ReflectionClass($definition);
         $constructor = $reflectionClass->getConstructor();
-        $parameters = $constructor ? $constructor->getParameters() : [];
+        $parameters = $constructor !== null ? $constructor->getParameters() : [];
         $dependencies = array_map(fn ($parameter) => $this->get($parameter->getName()), $parameters);
 
         return $reflectionClass->newInstanceArgs($dependencies);

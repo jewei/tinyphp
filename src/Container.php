@@ -105,13 +105,12 @@ abstract class Container implements ContainerInterface
         $results = [];
 
         foreach ($dependencies as $dependency) {
+
             $className = $this->getParameterClassName($dependency);
 
-            if ($className === null) {
-                throw new InvalidEntryException('Non-class hinted primitive dependency: '.$dependency->getName());
-            }
-
-            $result = $this->get($className);
+            $result = is_null($className)
+                ? $this->resolvePrimitive($dependency)
+                : $this->get($className);
 
             if ($dependency->isVariadic()) {
                 $results = array_merge($results, $result); /** @phpstan-ignore-line */
@@ -121,6 +120,19 @@ abstract class Container implements ContainerInterface
         }
 
         return $results;
+    }
+
+    private function resolvePrimitive(ReflectionParameter $parameter): mixed
+    {
+        if ($parameter->isDefaultValueAvailable()) {
+            return $parameter->getDefaultValue();
+        }
+
+        if ($parameter->isVariadic()) {
+            return [];
+        }
+
+        throw new InvalidEntryException('Unresolvable dependency in '.$parameter->getDeclaringClass()?->getName());
     }
 
     /**

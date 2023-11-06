@@ -28,9 +28,11 @@ abstract class Container implements ContainerInterface
      *
      * @param  class-string<object>|object  $value
      */
-    public function set(string $id, string|object $value): void
+    public function set(string $id, string|object $value): self
     {
         $this->definitions[$id] = $value;
+
+        return $this;
     }
 
     /**
@@ -76,19 +78,19 @@ abstract class Container implements ContainerInterface
             // See https://phpstan.org/blog/bring-your-exceptions-under-control.
             /** @throws ReflectionException */
             $reflector = new ReflectionClass($definition);
-        } catch (ReflectionException $e) {
-            throw new InvalidEntryException("Entry class '$id' does not exist.", 0, $e);
+        } catch (ReflectionException $reflectionException) {
+            throw new InvalidEntryException(sprintf('Entry class \'%s\' does not exist.', $id), 0, $reflectionException);
         }
 
         if (! $reflector->isInstantiable()) {
-            throw new InvalidEntryException("Entry class '$id' is not instantiable");
+            throw new InvalidEntryException(sprintf('Entry class \'%s\' is not instantiable', $id));
         }
 
         $constructor = $reflector->getConstructor();
 
         // Class has no dependencies, instantiate and return the instance.
         if (is_null($constructor)) {
-            return new $id;
+            return new $id();
         }
 
         $dependencies = $this->resolveDependencies($constructor->getParameters());
